@@ -7,26 +7,18 @@ class Database {
     public $conn;
 
     public function __construct() {
-        // Default untuk local development
-        $this->host = "localhost";
-        $this->db_name = "mahasiswa_db";
-        $this->username = "root";
-        $this->password = "";
-
-        // Untuk production di Render
-        if (getenv('RENDER')) {
-            $this->host = getenv('DB_HOST');
-            $this->db_name = getenv('DB_NAME');
-            $this->username = getenv('DB_USER');
-            $this->password = getenv('DB_PASSWORD');
-        }
+        // Default untuk InfinityFree
+        $this->host = "sql103.infinityfree.com";
+        $this->db_name = "if0_40367293_mahasiswa_db";
+        $this->username = "if0_40367293";
+        $this->password = "4bB41JgldB5WOr";
         
-        // Fallback untuk Docker environment
-        if (getenv('MYSQL_HOST')) {
-            $this->host = getenv('MYSQL_HOST');
-            $this->db_name = getenv('MYSQL_DATABASE');
-            $this->username = getenv('MYSQL_USER');
-            $this->password = getenv('MYSQL_PASSWORD');
+        // Untuk local development
+        if ($_SERVER['HTTP_HOST'] == 'localhost' || strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+            $this->host = "localhost";
+            $this->db_name = "mahasiswa_db";
+            $this->username = "root";
+            $this->password = "";
         }
     }
 
@@ -42,8 +34,13 @@ class Database {
             $this->conn->exec("set names utf8");
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
-            error_log("Database connection error: " . $exception->getMessage());
-            die("Database connection failed. Please check your configuration.");
+            // Jangan tampilkan error detail di production
+            if ($_SERVER['HTTP_HOST'] != 'localhost') {
+                error_log("Database connection error: " . $exception->getMessage());
+                die("Database connection failed. Please try again later.");
+            } else {
+                die("Connection error: " . $exception->getMessage());
+            }
         }
         return $this->conn;
     }
