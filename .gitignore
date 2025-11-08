@@ -11,3 +11,10 @@
 # Ignore OS files
 .DS_Store
 Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Apache
+.htaccess
